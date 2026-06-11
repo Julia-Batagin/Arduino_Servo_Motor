@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitor Servo Motor</title>
+    <style>
+        body {
+            background: rgb(105, 210, 255);
+            color:rgb(252, 254, 255);
+            font-family: monospace;
+            text-align: center;
+        }
+        h1{
+            font-size: 100px;
+        }
+    </style>
+</head>
+<body>
+    <h1 id="valor">--</h1>
+    <button onclick="conectar()">CONECTAR</button>
+    <script>
+        async function conectar() {
+            const porta = await navigator.serial.requestPort();
+            await porta.open({baudRate:9600});
+
+            const leitor = porta.readable.getReader();
+            let texto = "";
+
+            while(true){
+                const {value} = await leitor.read();
+                texto += new TextDecoder().decode(value);
+
+                const linhas = texto.split("\n");
+                texto = linhas.pop();
+                linhas.forEach(l => valor.textContent = l + "°");
+            }
+        }
+    </script>
+</body>
+</html>
